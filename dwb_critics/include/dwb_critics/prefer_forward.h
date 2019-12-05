@@ -36,7 +36,10 @@
 #define DWB_CRITICS_PREFER_FORWARD_H_
 
 #include <dwb_local_planner/trajectory_critic.h>
+#include <dynamic_reconfigure/server.h>
+#include <dwb_critics/PreferForwardConfig.h>
 #include <string>
+#include <dwb_critics/critic_cfg.h>
 
 namespace dwb_critics
 {
@@ -59,6 +62,12 @@ public:
 
 protected:
   double penalty_, strafe_x_, strafe_theta_, theta_scale_;
+
+private:
+  ros::NodeHandle base_nh_;
+  PreferForwardConfig cfg_;
+  std::unique_ptr<dynamic_reconfigure::Server<PreferForwardConfig>> server_;
+  mutable boost::recursive_mutex base_mutex_;
 };
 
 } /* namespace dwb_critics */

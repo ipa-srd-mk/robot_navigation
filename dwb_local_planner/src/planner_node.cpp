@@ -44,7 +44,7 @@ int main(int argc, char** argv)
   dwb_local_planner::DebugDWBLocalPlanner planner;
   ROS_INFO("Plan Node");
 
-  TFListenerPtr tf = std::make_shared<tf::TransformListener>();
+  TFListenerPtr tf;
 
   pluginlib::ClassLoader<nav_core2::Costmap> costmap_loader("nav_core2", "nav_core2::Costmap");
   std::string costmap_class;

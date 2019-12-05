@@ -14,6 +14,7 @@
   <depend>angles</depend>
   <depend>costmap_queue</depend>
   <depend>dwb_local_planner</depend>
+  <depend>dynamic_reconfigure</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_2d_msgs</depend>
   <depend>nav_2d_utils</depend>

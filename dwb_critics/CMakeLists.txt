@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   angles
   costmap_queue
   dwb_local_planner
+  dynamic_reconfigure
   geometry_msgs
   nav_2d_msgs
   nav_2d_utils
@@ -17,10 +18,15 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
 )
 
+generate_dynamic_reconfigure_options(
+  cfg/PreferForward.cfg
+  #...
+)
+
 catkin_package(
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
-    CATKIN_DEPENDS angles costmap_queue dwb_local_planner geometry_msgs nav_2d_msgs nav_2d_utils nav_core2 nav_grid_iterators pluginlib roscpp sensor_msgs
+    CATKIN_DEPENDS angles costmap_queue dwb_local_planner dynamic_reconfigure geometry_msgs nav_2d_msgs nav_2d_utils nav_core2 nav_grid_iterators pluginlib roscpp sensor_msgs
 )
 
 include_directories(
