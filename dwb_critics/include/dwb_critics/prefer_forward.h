@@ -56,18 +56,14 @@ namespace dwb_critics
 class PreferForwardCritic: public dwb_local_planner::TrajectoryCritic
 {
 public:
-  PreferForwardCritic() : penalty_(1.0), strafe_x_(0.1), strafe_theta_(0.2), theta_scale_(10.0) {}
+  PreferForwardCritic() {}
   void onInit() override;
   double scoreTrajectory(const dwb_msgs::Trajectory2D& traj) override;
 
 protected:
-  double penalty_, strafe_x_, strafe_theta_, theta_scale_;
 
 private:
-  ros::NodeHandle base_nh_;
-  PreferForwardConfig cfg_;
-  std::unique_ptr<dynamic_reconfigure::Server<PreferForwardConfig>> server_;
-  mutable boost::recursive_mutex base_mutex_;
+  CriticCfg<PreferForwardConfig> critic_cfg;
 };
 
 } /* namespace dwb_critics */

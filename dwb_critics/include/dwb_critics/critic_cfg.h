@@ -32,37 +32,47 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <dwb_critics/prefer_forward.h>
-#include <math.h>
-#include <pluginlib/class_list_macros.h>
+#ifndef DWB_CRITICS_CRITIC_CFG_H_
+#define DWB_CRITICS_CRITIC_CFG_H_
 
-PLUGINLIB_EXPORT_CLASS(dwb_critics::PreferForwardCritic, dwb_local_planner::TrajectoryCritic)
+
+#include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <dwb_critics/PreferForwardConfig.h>
+
 
 namespace dwb_critics
 {
 
-void PreferForwardCritic::onInit()
+/**
+ * @class CriticCfg
+ * @brief Template to make critics dynamically reconfigerable
+ */
+
+template <typename T>
+class CriticCfg
 {
-  critic_cfg.init(critic_nh_);
-}
-
-double PreferForwardCritic::scoreTrajectory(const dwb_msgs::Trajectory2D& traj)
-{
-  setScale(critic_cfg.cfg().scale);
-
-  // backward motions bad on a robot without backward sensors
-  if (traj.velocity.x < 0.0)
+public:
+  void init(ros::NodeHandle &critic_nh_)
   {
-    return critic_cfg.cfg().penalty;
+    server_.reset(new dynamic_reconfigure::Server<T>(mutex_, critic_nh_));
+    server_->setCallback([this](const T& cfg, uint32_t level) { reconfigure(cfg, level); });
   }
-  // strafing motions also bad on such a robot
-  if (traj.velocity.x < critic_cfg.cfg().strafe_x && fabs(traj.velocity.theta) < critic_cfg.cfg().strafe_theta)
+  T cfg() const
   {
-    return critic_cfg.cfg().penalty;
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+   return cfg_;
   }
-
-  // the more we rotate, the less we progress forward
-  return fabs(traj.velocity.theta) * critic_cfg.cfg().theta_scale;
-}
+private:
+  T cfg_;
+  std::unique_ptr<dynamic_reconfigure::Server<T>> server_;
+  mutable boost::recursive_mutex mutex_;
+  void reconfigure(const T& cfg, uint32_t)
+  {
+    boost::recursive_mutex::scoped_lock lock(mutex_);
+    cfg_ = cfg;
+  }
+};
 
 } /* namespace dwb_critics */
+#endif /* DWB_CRITICS_CRITIC_CFG_H_ */
