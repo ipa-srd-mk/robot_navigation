@@ -38,7 +38,6 @@
 
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
-#include <dwb_critics/PreferForwardConfig.h>
 
 
 namespace dwb_critics
@@ -47,12 +46,15 @@ namespace dwb_critics
 /**
  * @class CriticCfg
  * @brief Template to make critics dynamically reconfigerable
+ *
+ * scale should be set in the prepare function of the critic
  */
 
 template <typename T>
 class CriticCfg
 {
 public:
+  CriticCfg(): initialized_(false){}
   void init(ros::NodeHandle &critic_nh_)
   {
     server_.reset(new dynamic_reconfigure::Server<T>(mutex_, critic_nh_));
@@ -63,8 +65,10 @@ public:
     boost::recursive_mutex::scoped_lock lock(mutex_);
    return cfg_;
   }
+  bool isInitialized(){return initialized_;}
 private:
   T cfg_;
+  bool initialized_;
   std::unique_ptr<dynamic_reconfigure::Server<T>> server_;
   mutable boost::recursive_mutex mutex_;
   void reconfigure(const T& cfg, uint32_t)

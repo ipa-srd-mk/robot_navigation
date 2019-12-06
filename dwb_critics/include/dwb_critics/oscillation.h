@@ -36,6 +36,8 @@
 #define DWB_CRITICS_OSCILLATION_H_
 
 #include <dwb_local_planner/trajectory_critic.h>
+#include <dwb_critics/OscillationConfig.h>
+#include <dwb_critics/critic_cfg.h>
 #include <vector>
 #include <string>
 
@@ -148,6 +150,8 @@ protected:
   geometry_msgs::Pose2D pose_, prev_stationary_pose_;
   // Saved timestamp
   ros::Time prev_reset_time_;
+  CriticCfg<OscillationConfig> critic_cfg_;
+  OscillationConfig cfg_;
 };
 
 }  // namespace dwb_critics

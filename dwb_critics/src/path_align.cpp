@@ -43,7 +43,8 @@ namespace dwb_critics
 
 void PathAlignCritic::onInit()
 {
-  PathDistCritic::onInit();
+  MapGridCritic::onInit();
+  critic_cfg_.init(critic_nh_);
   stop_on_failure_ = false;
   forward_point_distance_ = nav_2d_utils::searchAndGetParam(critic_nh_, "forward_point_distance", 0.325);
 }
@@ -52,6 +53,9 @@ bool PathAlignCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_ms
                               const geometry_msgs::Pose2D& goal,
                               const nav_2d_msgs::Path2D& global_plan)
 {
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+  aggregationType_ = static_cast<ScoreAggregationType>(cfg_.aggregation_type);
   double dx = pose.x - goal.x;
   double dy = pose.y - goal.y;
   double sq_dist = dx * dx + dy * dy;

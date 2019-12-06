@@ -54,12 +54,7 @@ inline double hypot_sq(double dx, double dy)
 
 void RotateToGoalCritic::onInit()
 {
-  xy_goal_tolerance_ = nav_2d_utils::searchAndGetParam(critic_nh_, "xy_goal_tolerance", 0.25);
-  xy_goal_tolerance_sq_ = xy_goal_tolerance_ * xy_goal_tolerance_;
-  double stopped_xy_velocity = nav_2d_utils::searchAndGetParam(critic_nh_, "trans_stopped_velocity", 0.25);
-  stopped_xy_velocity_sq_ = stopped_xy_velocity * stopped_xy_velocity;
-  critic_nh_.param("slowing_factor", slowing_factor_, 5.0);
-  critic_nh_.param("lookahead_time", lookahead_time_, -1.0);
+  critic_cfg_.init(critic_nh_);
   reset();
 }
 
@@ -73,10 +68,12 @@ bool RotateToGoalCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d
                                  const geometry_msgs::Pose2D& goal,
                                  const nav_2d_msgs::Path2D& global_plan)
 {
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
   double dxy_sq = hypot_sq(pose.x - goal.x, pose.y - goal.y);
-  in_window_ = in_window_ || dxy_sq <= xy_goal_tolerance_sq_;
+  in_window_ = in_window_ || dxy_sq <= cfg_.xy_goal_tolerance * cfg_.xy_goal_tolerance;
   current_xy_speed_sq_ = hypot_sq(vel.x, vel.y);
-  rotating_ = rotating_ || (in_window_ && current_xy_speed_sq_ <= stopped_xy_velocity_sq_);
+  rotating_ = rotating_ || (in_window_ && current_xy_speed_sq_ <= cfg_.trans_stopped_velocity * cfg_.trans_stopped_velocity);
   goal_yaw_ = goal.theta;
   return true;
 }
@@ -95,7 +92,7 @@ double RotateToGoalCritic::scoreTrajectory(const dwb_msgs::Trajectory2D& traj)
     {
       throw nav_core2::IllegalTrajectoryException(name_, "Not slowing down near goal.");
     }
-    return speed_sq * slowing_factor_ + scoreRotation(traj);
+    return speed_sq * cfg_.slowing_factor + scoreRotation(traj);
   }
 
   // If we're sufficiently close to the goal, any transforming velocity is invalid
@@ -115,9 +112,9 @@ double RotateToGoalCritic::scoreRotation(const dwb_msgs::Trajectory2D& traj)
   }
 
   double end_yaw;
-  if (lookahead_time_ >= 0.0)
+  if (cfg_.lookahead_time >= 0.0)
   {
-    geometry_msgs::Pose2D eval_pose = dwb_local_planner::projectPose(traj, lookahead_time_);
+    geometry_msgs::Pose2D eval_pose = dwb_local_planner::projectPose(traj, cfg_.lookahead_time);
     end_yaw = eval_pose.theta;
   }
   else

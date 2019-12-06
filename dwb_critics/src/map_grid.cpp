@@ -62,27 +62,6 @@ void MapGridCritic::onInit()
 
   // Always set to true, but can be overriden by subclasses
   stop_on_failure_ = true;
-
-  std::string aggro_str;
-  critic_nh_.param("aggregation_type", aggro_str, std::string("last"));
-  std::transform(aggro_str.begin(), aggro_str.end(), aggro_str.begin(), ::tolower);
-  if (aggro_str == "last")
-  {
-    aggregationType_ = ScoreAggregationType::Last;
-  }
-  else if (aggro_str == "sum")
-  {
-    aggregationType_ = ScoreAggregationType::Sum;
-  }
-  else if (aggro_str == "product")
-  {
-    aggregationType_ = ScoreAggregationType::Product;
-  }
-  else
-  {
-    ROS_ERROR_NAMED("MapGridCritic", "aggregation_type parameter \"%s\" invalid. Using Last.", aggro_str.c_str());
-    aggregationType_ = ScoreAggregationType::Last;
-  }
 }
 
 void MapGridCritic::setAsObstacle(unsigned int x, unsigned int y)

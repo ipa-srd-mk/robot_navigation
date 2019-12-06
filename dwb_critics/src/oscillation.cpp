@@ -93,38 +93,23 @@ bool OscillationCritic::CommandTrend::hasSignFlipped()
 
 void OscillationCritic::onInit()
 {
-  oscillation_reset_dist_ = nav_2d_utils::searchAndGetParam(critic_nh_, "oscillation_reset_dist", 0.05);
-  oscillation_reset_dist_sq_ = oscillation_reset_dist_ * oscillation_reset_dist_;
-  oscillation_reset_angle_ = nav_2d_utils::searchAndGetParam(critic_nh_, "oscillation_reset_angle", 0.2);
-  oscillation_reset_time_ = nav_2d_utils::searchAndGetParam(critic_nh_, "oscillation_reset_time", -1.0);
+  critic_cfg_.init(critic_nh_);
 
   /**
-   * Historical Parameter Loading
-   * If x_only_threshold is set, use that.
-   * If min_speed_xy is set in the namespace (as it is often used for trajectory generation), use that.
-   * If min_trans_vel is set in the namespace, as it used to be used for trajectory generation, complain then use that.
-   * Otherwise, set x_only_threshold_ to 0.05
+   * Warning for Historical Parameter Usage
+   * min_speed_xy often used for trajectory generation
+   * min_trans_vel used to be used for trajectory generation
    */
-  std::string resolved_name;
-  if (critic_nh_.hasParam("x_only_threshold"))
+ if (critic_nh_.hasParam("min_speed_xy"))
   {
-    critic_nh_.getParam("x_only_threshold", x_only_threshold_);
+    ROS_WARN_NAMED("OscillationCritic", "Parameter min_speed_xy is not supported. "
+                                        "Please use the name x_only_threshold instead.");
   }
-  else if (critic_nh_.searchParam("min_speed_xy", resolved_name))
+  else if (critic_nh_.hasParam("min_trans_vel"))
   {
-    critic_nh_.getParam(resolved_name, x_only_threshold_);
+    ROS_WARN_NAMED("OscillationCritic", "Parameter min_trans_vel is not supported. "
+                                        "Please use the name x_only_threshold instead.");
   }
-  else if (critic_nh_.searchParam("min_trans_vel", resolved_name))
-  {
-    ROS_WARN_NAMED("OscillationCritic", "Parameter min_trans_vel is deprecated. "
-                                        "Please use the name min_speed_xy or x_only_threshold instead.");
-    critic_nh_.getParam(resolved_name, x_only_threshold_);
-  }
-  else
-  {
-    x_only_threshold_ = 0.05;
-  }
-
   reset();
 }
 
@@ -133,6 +118,9 @@ bool OscillationCritic::prepare(const geometry_msgs::Pose2D& pose,
                                 const geometry_msgs::Pose2D& goal,
                                 const nav_2d_msgs::Path2D& global_plan)
 {
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+
   pose_ = pose;
   return true;
 }
@@ -158,28 +146,28 @@ void OscillationCritic::debrief(const nav_2d_msgs::Twist2D& cmd_vel)
 
 bool OscillationCritic::resetAvailable()
 {
-  if (oscillation_reset_dist_ >= 0.0)
+  if (cfg_.oscillation_reset_dist >= 0.0)
   {
     double x_diff = pose_.x - prev_stationary_pose_.x;
     double y_diff = pose_.y - prev_stationary_pose_.y;
     double sq_dist = x_diff * x_diff + y_diff * y_diff;
-    if (sq_dist > oscillation_reset_dist_sq_)
+    if (sq_dist > cfg_.oscillation_reset_dist * cfg_.oscillation_reset_dist)
     {
       return true;
     }
   }
-  if (oscillation_reset_angle_ >= 0.0)
+  if (cfg_.oscillation_reset_angle >= 0.0)
   {
     double th_diff = pose_.theta - prev_stationary_pose_.theta;
-    if (fabs(th_diff) > oscillation_reset_angle_)
+    if (fabs(th_diff) > cfg_.oscillation_reset_angle)
     {
       return true;
     }
   }
-  if (oscillation_reset_time_ >= 0.0)
+  if (cfg_.oscillation_reset_time >= 0.0)
   {
     double t_diff = (ros::Time::now() - prev_reset_time_).toSec();
-    if (t_diff > oscillation_reset_time_)
+    if (t_diff > cfg_.oscillation_reset_time)
     {
       return true;
     }

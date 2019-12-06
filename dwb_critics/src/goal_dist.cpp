@@ -39,12 +39,26 @@
 
 namespace dwb_critics
 {
+void GoalDistCritic::onInit()
+{
+  MapGridCritic::onInit();
+
+  critic_cfg_.init(critic_nh_);
+
+}
+
 bool GoalDistCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
                              const geometry_msgs::Pose2D& goal,
                              const nav_2d_msgs::Path2D& global_plan)
 {
   reset();
-
+  // TODO: since GoalAlignCritic is derived from this class and has it's own config, we have to check this
+  if (critic_cfg_.isInitialized())
+  {
+    cfg_ = critic_cfg_.cfg();
+    setScale(cfg_.scale);
+    aggregationType_ = static_cast<ScoreAggregationType>(cfg_.aggregation_type);
+  }
   unsigned int local_goal_x, local_goal_y;
   if (!getLastPoseOnCostmap(global_plan, local_goal_x, local_goal_y))
   {

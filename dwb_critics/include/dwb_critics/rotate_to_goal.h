@@ -35,6 +35,8 @@
 #define DWB_CRITICS_ROTATE_TO_GOAL_H_
 
 #include <dwb_local_planner/trajectory_critic.h>
+#include <dwb_critics/RotateToGoalConfig.h>
+#include <dwb_critics/critic_cfg.h>
 #include <string>
 #include <vector>
 
@@ -94,6 +96,8 @@ protected:
   double current_xy_speed_sq_, stopped_xy_velocity_sq_;
   double slowing_factor_;
   double lookahead_time_;
+  CriticCfg<RotateToGoalConfig> critic_cfg_;
+  RotateToGoalConfig cfg_;
 };
 
 }  // namespace dwb_critics

@@ -43,26 +43,33 @@ namespace dwb_critics
 
 void PreferForwardCritic::onInit()
 {
-  critic_cfg.init(critic_nh_);
+  critic_cfg_.init(critic_nh_);
+}
+
+bool PreferForwardCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
+                       const geometry_msgs::Pose2D& goal,
+                       const nav_2d_msgs::Path2D& global_plan)
+{
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+  return true;
 }
 
 double PreferForwardCritic::scoreTrajectory(const dwb_msgs::Trajectory2D& traj)
 {
-  setScale(critic_cfg.cfg().scale);
-
   // backward motions bad on a robot without backward sensors
   if (traj.velocity.x < 0.0)
   {
-    return critic_cfg.cfg().penalty;
+    return cfg_.penalty;
   }
   // strafing motions also bad on such a robot
-  if (traj.velocity.x < critic_cfg.cfg().strafe_x && fabs(traj.velocity.theta) < critic_cfg.cfg().strafe_theta)
+  if (traj.velocity.x < cfg_.strafe_x && fabs(traj.velocity.theta) < cfg_.strafe_theta)
   {
-    return critic_cfg.cfg().penalty;
+    return cfg_.penalty;
   }
 
   // the more we rotate, the less we progress forward
-  return fabs(traj.velocity.theta) * critic_cfg.cfg().theta_scale;
+  return fabs(traj.velocity.theta) * cfg_.theta_scale;
 }
 
 } /* namespace dwb_critics */

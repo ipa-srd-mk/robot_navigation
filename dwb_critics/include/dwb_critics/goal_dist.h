@@ -35,6 +35,8 @@
 #define DWB_CRITICS_GOAL_DIST_H_
 
 #include <dwb_critics/map_grid.h>
+#include <dwb_critics/GoalDistConfig.h>
+#include <dwb_critics/critic_cfg.h>
 #include <vector>
 
 namespace dwb_critics
@@ -50,10 +52,14 @@ namespace dwb_critics
 class GoalDistCritic: public MapGridCritic
 {
 public:
+  void onInit() override;
   bool prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
                const geometry_msgs::Pose2D& goal, const nav_2d_msgs::Path2D& global_plan) override;
 protected:
   bool getLastPoseOnCostmap(const nav_2d_msgs::Path2D& global_plan, unsigned int& x, unsigned int& y);
+
+  CriticCfg<GoalDistConfig> critic_cfg_;
+  GoalDistConfig cfg_;
 };
 
 }  // namespace dwb_critics

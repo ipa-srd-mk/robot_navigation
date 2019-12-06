@@ -35,6 +35,7 @@
 #define DWB_CRITICS_PATH_ALIGN_H_
 
 #include <dwb_critics/path_dist.h>
+#include <dwb_critics/PathAlignConfig.h>
 #include <vector>
 #include <string>
 
@@ -65,6 +66,8 @@ public:
 protected:
   bool zero_scale_;
   double forward_point_distance_;
+  CriticCfg<PathAlignConfig> critic_cfg_;
+  PathAlignConfig cfg_;
 };
 
 }  // namespace dwb_critics
