@@ -140,11 +140,6 @@ protected:
   bool resetAvailable();
 
   CommandTrend x_trend_, y_trend_, theta_trend_;
-  double oscillation_reset_dist_, oscillation_reset_angle_, x_only_threshold_;
-  double oscillation_reset_time_;
-
-  // Cached square parameter
-  double oscillation_reset_dist_sq_;
 
   // Saved positions
   geometry_msgs::Pose2D pose_, prev_stationary_pose_;

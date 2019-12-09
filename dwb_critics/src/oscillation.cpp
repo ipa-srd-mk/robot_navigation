@@ -189,7 +189,7 @@ bool OscillationCritic::setOscillationFlags(const nav_2d_msgs::Twist2D& cmd_vel)
   flag_set |= x_trend_.update(cmd_vel.x);
 
   // we'll only set flags for strafing and rotating when we're not moving forward at all
-  if (x_only_threshold_ < 0.0 || fabs(cmd_vel.x) <= x_only_threshold_)
+  if (cfg_.x_only_threshold < 0.0 || fabs(cmd_vel.x) <= cfg_.x_only_threshold)
   {
     flag_set |= y_trend_.update(cmd_vel.y);
     flag_set |= theta_trend_.update(cmd_vel.theta);
