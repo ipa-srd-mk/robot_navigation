@@ -59,6 +59,7 @@ public:
   {
     server_.reset(new dynamic_reconfigure::Server<T>(mutex_, critic_nh_));
     server_->setCallback([this](const T& cfg, uint32_t level) { reconfigure(cfg, level); });
+    initialized_ = true;
   }
   T cfg() const
   {
