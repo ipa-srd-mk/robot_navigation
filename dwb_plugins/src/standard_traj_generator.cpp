@@ -144,6 +144,7 @@ dwb_msgs::Trajectory2D StandardTrajectoryGenerator::generateTrajectory(const geo
     const nav_2d_msgs::Twist2D& cmd_vel)
 {
   dwb_msgs::Trajectory2D traj;
+  ocf_slowdown_ = false;
   traj.velocity = cmd_vel;
 
   //  simulate the trajectory
@@ -168,6 +169,7 @@ dwb_msgs::Trajectory2D StandardTrajectoryGenerator::generateTrajectory(const geo
     traj.poses.push_back(pose);
     traj.time_offsets.push_back(ros::Duration(running_time));
   }
+  traj.ocf_slowdown = ocf_slowdown_;
 
   return traj;
 }

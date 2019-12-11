@@ -125,6 +125,7 @@ protected:
   double time_granularity_;     ///< If discretizing by time, the amount of time between each point in the traj
   double linear_granularity_;   ///< If not discretizing by time, the amount of linear space between points
   double angular_granularity_;  ///< If not discretizing by time, the amount of angular space between points
+  bool ocf_slowdown_;
 
   /* Backwards Compatibility Parameter: include_last_point
    *

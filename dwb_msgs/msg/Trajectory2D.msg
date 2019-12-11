@@ -9,3 +9,5 @@ geometry_msgs/Pose2D[] poses
 # Time difference between the current pose and the poses in the trajectory.
 # Parallel array to poses. Length should be the same.
 duration[] time_offsets
+
+bool ocf_slowdown

@@ -343,7 +343,8 @@ dwb_msgs::TrajectoryScore DWBLocalPlanner::coreScoringAlgorithm(const geometry_m
     }
     throw NoLegalTrajectoriesException(tracker);
   }
-
+  if (best.traj.ocf_slowdown)
+    ROS_WARN("Using Trajectory that is influenced by OCF!");
   return best;
 }
 
