@@ -74,7 +74,7 @@ void DWBPublisher::initialize(ros::NodeHandle& nh)
 
   nh.param("publish_trajectories", publish_trajectories_, true);
   if (publish_trajectories_)
-    marker_pub_ = global_nh.advertise<visualization_msgs::MarkerArray>("marker", 1);
+    marker_pub_ = nh.advertise<visualization_msgs::MarkerArray>("trajectories", 1);
   double marker_lifetime;
   nh.param("marker_lifetime", marker_lifetime, 0.1);
   marker_lifetime_ = ros::Duration(marker_lifetime);
@@ -107,7 +107,7 @@ void DWBPublisher::publishTrajectories(const dwb_msgs::LocalPlanEvaluation& resu
   m.header = results.header;
   m.type = m.LINE_STRIP;
   m.pose.orientation.w = 1;
-  m.scale.x = 0.002;
+
   m.color.a = 1.0;
   m.lifetime = marker_lifetime_;
 
@@ -124,15 +124,27 @@ void DWBPublisher::publishTrajectories(const dwb_msgs::LocalPlanEvaluation& resu
     const dwb_msgs::TrajectoryScore& twist = results.twists[i];
     if (twist.total >= 0)
     {
-      m.color.r = 1 - (twist.total - best_cost) / denominator;
-      m.color.g = 1 - (twist.total - best_cost) / denominator;
-      m.color.b = 1;
+      if (i == results.best_index)
+      {
+        m.color.r = 0;
+        m.color.g = 1;
+        m.color.b = 0;
+        m.scale.x = 0.01;
+      }
+      else
+      {
+        m.color.r = 1 - (twist.total - best_cost) / denominator;
+        m.color.g = 1 - (twist.total - best_cost) / denominator;
+        m.color.b = 1;
+        m.scale.x = 0.002;
+      }
       m.ns = "ValidTrajectories";
     }
     else
     {
       m.color.b = 0;
       m.ns = "InvalidTrajectories";
+      m.scale.x = 0.001;
     }
     m.points.clear();
     for (unsigned int j = 0; j < twist.traj.poses.size(); ++j)
@@ -140,6 +152,15 @@ void DWBPublisher::publishTrajectories(const dwb_msgs::LocalPlanEvaluation& resu
       pt.x = twist.traj.poses[j].x;
       pt.y = twist.traj.poses[j].y;
       pt.z = 0;
+
+      // visualize turn-only movements
+      if (std::fabs(twist.traj.velocity.x) < 0.01)
+      {
+        m.points.push_back(pt);
+        pt.z = twist.traj.velocity.theta;
+        m.points.push_back(pt);
+        break;
+      }
       m.points.push_back(pt);
     }
     ma.markers.push_back(m);
