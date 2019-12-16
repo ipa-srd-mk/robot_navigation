@@ -36,6 +36,8 @@
 #define DWB_CRITICS_TWIRLING_H
 
 #include <dwb_local_planner/trajectory_critic.h>
+#include <dwb_critics/TwirlingConfig.h>
+#include <dwb_critics/critic_cfg.h>
 
 namespace dwb_critics
 {
@@ -52,7 +54,12 @@ class TwirlingCritic: public dwb_local_planner::TrajectoryCritic
 {
 public:
   void onInit() override;
+  bool prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
+               const geometry_msgs::Pose2D& goal, const nav_2d_msgs::Path2D& global_plan) override;
   double scoreTrajectory(const dwb_msgs::Trajectory2D& traj) override;
+protected:
+  CriticCfg<TwirlingConfig> critic_cfg_;
+  TwirlingConfig cfg_;
 };
 }  // namespace dwb_critics
 

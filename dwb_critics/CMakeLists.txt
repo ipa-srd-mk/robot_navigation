@@ -19,13 +19,16 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 generate_dynamic_reconfigure_options(
-  cfg/PreferForward.cfg
-  cfg/GoalDist.cfg
+  cfg/BaseObstacle.cfg
   cfg/GoalAlign.cfg
+  cfg/GoalDist.cfg
+  cfg/ObstacleFootprint.cfg
   cfg/Oscillation.cfg
   cfg/PathDist.cfg
   cfg/PathAlign.cfg
+  cfg/PreferForward.cfg
   cfg/RotateToGoal.cfg
+  cfg/Twirling.cfg
   #...
 )
 

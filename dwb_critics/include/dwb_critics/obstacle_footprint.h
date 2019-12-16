@@ -36,6 +36,8 @@
 #define DWB_CRITICS_OBSTACLE_FOOTPRINT_H
 
 #include <dwb_critics/base_obstacle.h>
+#include <dwb_critics/ObstacleFootprintConfig.h>
+#include <dwb_critics/critic_cfg.h>
 #include <nav_2d_msgs/Polygon2D.h>
 #include <vector>
 
@@ -64,6 +66,8 @@ public:
   double getScale() const override { return costmap_->getResolution() * scale_; }
 protected:
   nav_2d_msgs::Polygon2D footprint_spec_;
+  CriticCfg<ObstacleFootprintConfig> critic_cfg_;
+  ObstacleFootprintConfig cfg_;
 };
 }  // namespace dwb_critics
 

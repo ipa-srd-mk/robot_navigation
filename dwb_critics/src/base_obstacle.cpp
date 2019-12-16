@@ -44,7 +44,16 @@ namespace dwb_critics
 
 void BaseObstacleCritic::onInit()
 {
-  critic_nh_.param("sum_scores", sum_scores_, false);
+  critic_cfg_.init(critic_nh_);
+}
+
+bool BaseObstacleCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
+             const geometry_msgs::Pose2D& goal, const nav_2d_msgs::Path2D& global_plan)
+{
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+  sum_scores_ = cfg_.sum_scores;
+  return true;
 }
 
 double BaseObstacleCritic::scoreTrajectory(const dwb_msgs::Trajectory2D& traj)

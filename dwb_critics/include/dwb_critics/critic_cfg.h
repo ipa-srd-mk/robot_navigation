@@ -46,8 +46,6 @@ namespace dwb_critics
 /**
  * @class CriticCfg
  * @brief Template to make critics dynamically reconfigerable
- *
- * scale should be set in the prepare function of the critic
  */
 
 template <typename T>

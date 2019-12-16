@@ -49,8 +49,8 @@ namespace dwb_critics
 
 void ObstacleFootprintCritic::onInit()
 {
-  BaseObstacleCritic::onInit();
   footprint_spec_ = nav_2d_utils::footprintFromParams(critic_nh_);
+  critic_cfg_.init(critic_nh_);
 }
 
 bool ObstacleFootprintCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
@@ -61,6 +61,9 @@ bool ObstacleFootprintCritic::prepare(const geometry_msgs::Pose2D& pose, const n
     ROS_ERROR_NAMED("ObstacleFootprintCritic", "Footprint spec is empty, maybe missing call to setFootprint?");
     return false;
   }
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+  sum_scores_ = cfg_.sum_scores;
   return true;
 }
 

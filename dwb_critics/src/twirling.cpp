@@ -39,11 +39,17 @@ namespace dwb_critics
 {
 void TwirlingCritic::onInit()
 {
-  // Scale is set to 0 by default, so if it was not set otherwise, set to 0
-  if (!critic_nh_.hasParam("scale"))
-  {
-    scale_ = 0.0;
-  }
+  critic_cfg_.init(critic_nh_);
+}
+
+
+bool TwirlingCritic::prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
+                                 const geometry_msgs::Pose2D& goal,
+                                 const nav_2d_msgs::Path2D& global_plan)
+{
+  cfg_ = critic_cfg_.cfg();
+  setScale(cfg_.scale);
+  return true;
 }
 
 double TwirlingCritic::scoreTrajectory(const dwb_msgs::Trajectory2D& traj)

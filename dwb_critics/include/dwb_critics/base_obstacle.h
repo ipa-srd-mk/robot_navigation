@@ -36,6 +36,8 @@
 #define DWB_CRITICS_BASE_OBSTACLE_H
 
 #include <dwb_local_planner/trajectory_critic.h>
+#include <dwb_critics/BaseObstacleConfig.h>
+#include <dwb_critics/critic_cfg.h>
 
 namespace dwb_critics
 {
@@ -54,6 +56,8 @@ class BaseObstacleCritic : public dwb_local_planner::TrajectoryCritic
 {
 public:
   void onInit() override;
+  bool prepare(const geometry_msgs::Pose2D& pose, const nav_2d_msgs::Twist2D& vel,
+               const geometry_msgs::Pose2D& goal, const nav_2d_msgs::Path2D& global_plan) override;
   double scoreTrajectory(const dwb_msgs::Trajectory2D& traj) override;
   void addCriticVisualization(sensor_msgs::PointCloud& pc) override;
 
@@ -73,6 +77,8 @@ public:
 
 protected:
   bool sum_scores_;
+  CriticCfg<BaseObstacleConfig> critic_cfg_;
+  BaseObstacleConfig cfg_;
 };
 }  // namespace dwb_critics
 
